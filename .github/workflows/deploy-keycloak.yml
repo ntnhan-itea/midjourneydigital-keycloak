@@ -1,0 +1,31 @@
+name: Deploy Keycloak
+
+on:
+  push:
+    branches: 
+      - main
+
+jobs:
+  deploy-postgres:
+    runs-on: ubuntu-latest
+
+    steps:         
+    - name: Deploy to Ubuntu server
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.SERVER_IP }}
+        username: ${{ vars.SERVER_USERNAME }}
+        key: ${{ secrets.SERVER_SSH_KEY }}
+        script: |
+          set -e
+          docker stop ${{ vars.CONTAINER_NAME }} || true
+          docker rm -f ${{ vars.CONTAINER_NAME }} || true
+          docker network create ${{ vars.DOCKER_NETWORK }} || true
+          docker run -d --name ${{ vars.CONTAINER_NAME }} \
+          --network=${{ vars.DOCKER_NETWORK }} \
+          -v ${{ vars.DB_STORE_FOLDER }}:/var/lib/postgresql/data \
+          -e POSTGRES_DB=${{ vars.DB_NAME }} \
+          -e POSTGRES_USER=admin \
+          -e POSTGRES_PASSWORD=${{ secrets.DB_PASSWORD }} \
+          -p 5432:5432 \
+          postgres:13.6 

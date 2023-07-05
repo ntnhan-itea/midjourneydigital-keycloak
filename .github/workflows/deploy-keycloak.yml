@@ -21,11 +21,11 @@ jobs:
           docker stop ${{ vars.CONTAINER_NAME }} || true
           docker rm -f ${{ vars.CONTAINER_NAME }} || true
           docker network create ${{ vars.DOCKER_NETWORK }} || true
-          docker run -d --name ${{ vars.CONTAINER_NAME }} \
-          --network=${{ vars.DOCKER_NETWORK }} \
-          -v ${{ vars.DB_STORE_FOLDER }}:/var/lib/postgresql/data \
-          -e POSTGRES_DB=${{ vars.DB_NAME }} \
-          -e POSTGRES_USER=admin \
-          -e POSTGRES_PASSWORD=${{ secrets.DB_PASSWORD }} \
-          -p 5432:5432 \
-          postgres:13.6 
+          docker run -d \
+          --name ${{ vars.CONTAINER_NAME }} \
+          -p 9090:8080 \
+          -v ${{ vars.KEYCLOAK_STORE_FOLDER }}:/opt/jboss/keycloak/standalone/data \
+          -e KEYCLOAK_USER=${{ secrets.KEYCLOAK_USR }} \
+          -e KEYCLOAK_PASSWORD=${{ secrets.KEYCLOAK_PWD }} \
+          -e JAVA_OPTS="-Dkeycloak.profile.feature.upload_scripts=enabled" \
+          jboss/keycloak:16.1.1

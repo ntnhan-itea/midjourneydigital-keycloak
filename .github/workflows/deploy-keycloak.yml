@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  deploy-postgres:
+  deploy-keycloak:
     runs-on: ubuntu-latest
 
     steps:         
@@ -27,5 +27,7 @@ jobs:
           -v ${{ vars.KEYCLOAK_STORE_FOLDER }}:/opt/jboss/keycloak/standalone/data \
           -e KEYCLOAK_USER=${{ secrets.KEYCLOAK_USR }} \
           -e KEYCLOAK_PASSWORD=${{ secrets.KEYCLOAK_PWD }} \
+          -e PROXY_ADDRESS_FORWARDING=true \
+          -e KEYCLOAK_HOSTNAME=${{ vars.KEYCLOAK_HOSTNAME }} \
           -e JAVA_OPTS="-Dkeycloak.profile.feature.upload_scripts=enabled" \
           jboss/keycloak:16.1.1
